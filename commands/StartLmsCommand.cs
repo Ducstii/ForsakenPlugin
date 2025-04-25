@@ -16,7 +16,7 @@ namespace forsaken.Commands
             Log.Debug("StartLMS command executing...");
             var plugin = ForsakenPlugin.Instance;
             plugin.StartLmsSequence(sender as CommandSender);
-            Cassie.Message("Last Man Standing!", isSubtitles: true);
+            Cassie.Message("<color=red>Last Man Standing!</color>", isSubtitles: true);
             Log.Debug("LMS sequence started");
             response = "LMS mode started!";
             return true;

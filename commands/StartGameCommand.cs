@@ -22,8 +22,14 @@ namespace forsaken.Commands
                     Log.Debug("[StartGame] Command execution starting...");
                 }
 
+                if (plugin.IsGameRunning)
+                {
+                    response = "A game is already in progress! User over to end the game, or wait for it to end.";
+                    return false;
+                }
+
                 // Start the game sequence
-                plugin.StartGameSequence(); // Just call the method directly
+                plugin.StartGameSequence();
 
                 Log.Debug("[StartGame] Game sequence started");
                 response = "Game sequence started!";

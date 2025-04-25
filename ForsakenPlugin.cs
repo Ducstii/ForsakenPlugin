@@ -21,10 +21,12 @@ namespace forsaken
 
         private static ForsakenPlugin Singleton;
         public static ForsakenPlugin Instance { get; private set; }
-        private ForsakenCommand forsakenCommand;
         private CoroutineHandle timerCoroutine;
         private int countdownTime;
         private PlayerEvents playerEvents;
+        private bool isGameRunning;
+
+        public bool IsGameRunning => isGameRunning;
 
         private string FindPluginDll(string pluginName)
         {
@@ -50,6 +52,7 @@ namespace forsaken
             Instance = this;
             Singleton = this;
             playerEvents = new PlayerEvents();
+            isGameRunning = false;
             
             if (Config.Debug)
             {
@@ -155,12 +158,6 @@ namespace forsaken
             Exiled.Events.Handlers.Player.DroppingItem -= playerEvents.OnDroppingItem;
             Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
 
-            // Unregister commands
-            if (forsakenCommand != null)
-            {
-                RemoteAdmin.CommandProcessor.RemoteAdminCommandHandler.UnregisterCommand(forsakenCommand);
-            }
-
             // Stop any running coroutines
             if (timerCoroutine.IsRunning)
             {
@@ -261,10 +258,18 @@ namespace forsaken
 
         public void StartGameSequence()
         {
+            if (isGameRunning)
+            {
+                Log.Error("[Forsaken] Attempted to start game while another game is in progress!");
+                return;
+            }
+
             if (Config.Debug)
             {
                 Log.Debug("[Forsaken] Starting game sequence...");
             }
+
+            isGameRunning = true;
 
             // Ensure item interactions are properly restricted based on config
             Exiled.Events.Handlers.Player.DroppingItem -= playerEvents.OnDroppingItem;
@@ -296,7 +301,7 @@ namespace forsaken
             }
 
             // Play the CASSIE countdown with exact spacing
-            Cassie.Message("<color=red>5 . 4 . 3 . 2 . 1 . HIDE</color>", isSubtitles: true);
+            Cassie.Message("<color=red> 5 . 4 . 3 . 2 . 1 . HIDE </color>", isSubtitles: true);
 
             // Start the sequence coroutine
             timerCoroutine = Timing.RunCoroutine(GameSequenceCoroutine());
@@ -375,6 +380,7 @@ namespace forsaken
             }
             
             StopTimer();
+            isGameRunning = false;
         }
 
         public void StopTimer()
@@ -383,6 +389,7 @@ namespace forsaken
             {
                 Timing.KillCoroutines(timerCoroutine);
             }
+            isGameRunning = false;
         }
 
         public void StartLmsSequence(CommandSender sender)
