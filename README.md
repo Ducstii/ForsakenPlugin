@@ -63,5 +63,5 @@ For this to function correctly, you need to properly configure your map in this 
 - More will be listed if I find more.
 
 ## Contacts
-- Discord: https://discord.com/user/1083550921419673610
+- Discord: Ducstii
 - Email: Ducstii.MD@gmail.com
