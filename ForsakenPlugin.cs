@@ -1,23 +1,14 @@
-using CommandSystem;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
-using Exiled.API.Interfaces;
 using PlayerRoles;
-using System.Reflection;
 using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using forsaken.Commands;
 using forsaken.Events;
-using MapEditorReborn.API.Features;
-using System.ComponentModel;
-using ExiledEvents = Exiled.Events.Events;
-using UnityEngine;
 using MEC;
-using Exiled.Events;
 
 namespace forsaken
 {
@@ -116,11 +107,6 @@ namespace forsaken
                 }
             }
 
-            // Register commands
-            forsakenCommand = new ForsakenCommand();
-            RemoteAdmin.CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(forsakenCommand);
-            Exiled.API.Features.Log.Info("Registered Forsaken commands");
-
             // Check for required plugins
             var missingDependencies = new List<string>();
 
@@ -210,36 +196,33 @@ namespace forsaken
             }
         }
 
-        public bool LoadMap(string mapName)
+        public IEnumerator<float> LoadMapCoroutine(string mapName)
         {
+            if (Config.Debug)
+            {
+                Log.Debug($"[Forsaken:LoadMap] Starting map load process");
+                Log.Debug($"[Forsaken:LoadMap] Map name: {mapName}");
+                
+                string mapPath = Path.Combine(Paths.Configs, "MapEditorReborn", "Maps", $"{mapName}.yml");
+                Log.Debug($"[Forsaken:LoadMap] Full map path: {mapPath}");
+                
+                string mapDirectory = Path.Combine(Paths.Configs, "MapEditorReborn", "Maps");
+                if (!Directory.Exists(mapDirectory))
+                {
+                    Log.Debug($"[Forsaken:LoadMap] Map directory does not exist: {mapDirectory}");
+                    Directory.CreateDirectory(mapDirectory);
+                    Log.Debug("[Forsaken:LoadMap] Created map directory");
+                }
+            }
+
             try
             {
-                if (Config.Debug)
-                {
-                    Log.Debug($"[Forsaken:LoadMap] Starting map load process");
-                    Log.Debug($"[Forsaken:LoadMap] Map name: {mapName}");
-                    
-                    string mapPath = Path.Combine(Paths.Configs, "MapEditorReborn", "Maps", $"{mapName}.yml");
-                    Log.Debug($"[Forsaken:LoadMap] Full map path: {mapPath}");
-                    
-                    string mapDirectory = Path.Combine(Paths.Configs, "MapEditorReborn", "Maps");
-                    if (!Directory.Exists(mapDirectory))
-                    {
-                        Log.Debug($"[Forsaken:LoadMap] Map directory does not exist: {mapDirectory}");
-                        Directory.CreateDirectory(mapDirectory);
-                        Log.Debug("[Forsaken:LoadMap] Created map directory");
-                    }
-                }
-
                 MapEditorReborn.API.Features.MapUtils.LoadMap(mapName);
                 
                 if (Config.Debug)
                 {
                     Log.Debug("[Forsaken:LoadMap] Map load command executed");
                 }
-
-                System.Threading.Thread.Sleep(2000);
-                return true;
             }
             catch (Exception ex)
             {
@@ -249,6 +232,29 @@ namespace forsaken
                     Log.Debug($"[Forsaken:LoadMap] Full exception details:");
                     Log.Debug($"[Forsaken:LoadMap] Stack trace: {ex.StackTrace}");
                 }
+                yield break;
+            }
+
+            // Wait for map to load
+            yield return Timing.WaitForSeconds(2f);
+
+            if (Config.Debug)
+            {
+                Log.Debug("[Forsaken:LoadMap] Map load completed");
+            }
+        }
+
+        public bool LoadMap(string mapName)
+        {
+            try
+            {
+                // Start the coroutine and wait for it to complete
+                Timing.RunCoroutine(LoadMapCoroutine(mapName));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[Forsaken:LoadMap] Error starting map load: {ex.Message}");
                 return false;
             }
         }
@@ -280,6 +286,13 @@ namespace forsaken
                 {
                     Log.Debug("[Forsaken] Re-registered item pickup prevention for game sequence");
                 }
+            }
+
+            // Turn off all lights at the start
+            Map.TurnOffAllLights(99999f);
+            if (Config.Debug)
+            {
+                Log.Debug("[Forsaken] Lights turned off for game sequence");
             }
 
             // Play the CASSIE countdown with exact spacing
@@ -341,6 +354,14 @@ namespace forsaken
                 player.Role.Set(RoleTypeId.Tutorial);
             }
             Map.Broadcast(5, Config.TimeUpMessage);
+            
+            // Turn the lights back on
+            Map.TurnOffAllLights(0f);
+            if (Config.Debug)
+            {
+                Log.Debug("[Forsaken] Game ended - lights turned back on");
+            }
+            
             StopTimer();
         }
 

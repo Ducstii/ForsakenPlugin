@@ -1,4 +1,3 @@
-using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 
 namespace forsaken.Events

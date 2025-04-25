@@ -2,7 +2,6 @@ using CommandSystem;
 using Exiled.API.Features;
 using PlayerRoles;
 using System;
-using System.Linq;
 using Exiled.API.Enums;
 
 namespace forsaken.Commands

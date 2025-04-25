@@ -1,6 +1,6 @@
 # Forsaken Plugin
 
-A custom plugin for SCP:SL servers that adds minigame functionality.
+A plugin that remakes the idea of "Forsaken" within SCP SL, my second plugin to date.
 
 ## Features
 
@@ -29,10 +29,10 @@ All commands are Remote Admin commands:
 
 | Command | Description | Function |
 |---------|-------------|-----------|
-| `pregame` | Loads the map and prepares it for the game | - Loads MiniGame map<br>- Manages door states in LCZ<br>- Turns off lights<br>- Teleports players to spawn position<br>- Disables item drops if configured |
-| `startlms` | Starts Last Man Standing mode | - Initiates LMS sequence<br>- Plays CASSIE announcement |
+| `pregame` | Prepares the game for all players. | - Loads specified map<br>- Turns off lights<br>- Teleports players to spawn position<br>- Disables item drops if configured |
+| `startlms` | Starts Last Man Standing mode | - Initiates LMS sequence<br>- Sets timer to 1:36 |
 | `over` | Ends the current game | - Stops any running game sequences |
-| `startgame` | Starts the game with countdown | - Initiates game sequence<br>- Starts countdown timer |
+| `startgame` | Starts the game with countdown | - Initiates game sequence<br>- Starts countdown timer<br>- opens the 173 connector door. |
 | `loadmap` | Loads the MiniGame map | - Loads specified map from config |
 | `forsaken` | Main command | - Shows all available subcommands |
 | `meme` | Fun command | - Adds some fun to the game |
@@ -58,26 +58,5 @@ forsaken:
 
 This plugin is built using .NET Framework 4.8 and EXILED API.
 
-### Door Management
-
-The plugin manages several types of doors in Light Containment Zone:
-
-#### Doors that are locked and opened:
-- LCZ_173_ARMORY
-- LCZ_173_BOTTOM
-- GR18
-- LCZ_ARMORY
-- LCZ_WC
-
-#### Doors that are locked only:
-- LCZ_079_ARMORY
-- LCZ_079_FIRST
-- LCZ_079_SECOND
-- 173_CONNECTOR
-- LCZ_939
-- 914
-- 330
-- 330_CHAMBER 
-
 #### NOTE
-This plugin, forsaken, was used with the help of Cursor AI and Copilot. Its around a 50/50 split effort.
+For this to function correctly, you need to properly configure your map in this plugins config. This minigame is meant to take place in LCZ only, so it locks down the checkpoints. When the startgame is used, it opens the "173_CONNECTOR" door to let the killer out. Contact me if you need a base minigame map.
