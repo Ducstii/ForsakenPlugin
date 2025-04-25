@@ -296,7 +296,7 @@ namespace forsaken
             }
 
             // Play the CASSIE countdown with exact spacing
-            Cassie.Message("5 . 4 . 3 . 2 . 1 . hide", isSubtitles: true);
+            Cassie.Message("<color=red>5 . 4 . 3 . 2 . 1 . HIDE</color>", isSubtitles: true);
 
             // Start the sequence coroutine
             timerCoroutine = Timing.RunCoroutine(GameSequenceCoroutine());
@@ -312,15 +312,23 @@ namespace forsaken
             // Wait for CASSIE to finish (approximately 10 seconds)
             yield return Timing.WaitForSeconds(10f);
 
-            // Open the 173 connector door but keep it locked
+            // Just open the 173 connector door without locking it
             try
             {
                 foreach (var door in Door.List)
                 {
                     if (door.Name == "173_CONNECTOR")
                     {
+                        // Make sure any existing locks are removed
+                        door.ChangeLock(DoorLockType.None);
+                        
+                        // Simply open the door
                         door.IsOpen = true;
-                        door.ChangeLock(DoorLockType.AdminCommand);
+                        
+                        if (Config.Debug)
+                        {
+                            Log.Debug("[Forsaken] 173 connector door opened");
+                        }
                         break;
                     }
                 }
@@ -328,6 +336,10 @@ namespace forsaken
             catch (Exception ex)
             {
                 Log.Error($"Error handling 173 connector door: {ex.Message}");
+                if (Config.Debug)
+                {
+                    Log.Debug($"[Forsaken] Full exception details: {ex.StackTrace}");
+                }
             }
 
             // Start timer based on config
