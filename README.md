@@ -78,3 +78,6 @@ The plugin manages several types of doors in Light Containment Zone:
 - 914
 - 330
 - 330_CHAMBER 
+
+#### NOTE
+This plugin, forsaken, was used with the help of Cursor AI and Copilot. Its around a 50/50 split effort.
