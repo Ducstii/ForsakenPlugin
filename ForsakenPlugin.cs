@@ -317,22 +317,20 @@ namespace forsaken
             // Wait for CASSIE to finish (approximately 10 seconds)
             yield return Timing.WaitForSeconds(10f);
 
-            // Just open the 173 connector door without locking it
+            // Open and lock the 173 connector door after CASSIE finishes
             try
             {
                 foreach (var door in Door.List)
                 {
                     if (door.Name == "173_CONNECTOR")
                     {
-                        // Make sure any existing locks are removed
-                        door.ChangeLock(DoorLockType.None);
-                        
-                        // Simply open the door
+                        // Lock the door with admin command and force it open
+                        door.ChangeLock(DoorLockType.AdminCommand);
                         door.IsOpen = true;
                         
                         if (Config.Debug)
                         {
-                            Log.Debug("[Forsaken] 173 connector door opened");
+                            Log.Debug("[Forsaken] 173 connector door opened and locked");
                         }
                         break;
                     }
