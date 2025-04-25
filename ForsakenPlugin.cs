@@ -57,7 +57,8 @@ namespace forsaken
             if (Config.Debug)
             {
                 Log.Debug("[Forsaken] Plugin is being enabled...");
-            
+            }
+            Log.Info("Forsaken Minigame by Ducstii has been loaded");
             RegisterEvents();
             RegisterCommands();
             
@@ -134,7 +135,9 @@ namespace forsaken
             }
             
             if (Config.Debug)
+            {
                 Log.Debug("[Forsaken] Events registered successfully");
+            }
         }
 
         private void RegisterCommands()
