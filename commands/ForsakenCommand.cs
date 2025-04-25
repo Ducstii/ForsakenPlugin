@@ -20,6 +20,7 @@ namespace forsaken.Commands
             RegisterCommand(new StartLmsCommand());
             RegisterCommand(new LoadMapCommand());
             RegisterCommand(new MemeCommand());
+            RegisterCommand(new BackupCommand());
         }
 
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
