@@ -17,6 +17,7 @@ using System.ComponentModel;
 using ExiledEvents = Exiled.Events.Events;
 using UnityEngine;
 using MEC;
+using Exiled.Events;
 
 namespace forsaken
 {
@@ -96,6 +97,25 @@ namespace forsaken
                 Log.Info($"Created default config file at {configPath}");
             }
 
+            // Register item interaction events based on config
+            if (!Config.AllowItemDrops)
+            {
+                Exiled.Events.Handlers.Player.DroppingItem += playerEvents.OnDroppingItem;
+                if (Config.Debug)
+                {
+                    Log.Debug("[Forsaken] Registered item drop prevention");
+                }
+            }
+
+            if (!Config.AllowItemPickups)
+            {
+                Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
+                if (Config.Debug)
+                {
+                    Log.Debug("[Forsaken] Registered item pickup prevention");
+                }
+            }
+
             // Register commands
             forsakenCommand = new ForsakenCommand();
             RemoteAdmin.CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(forsakenCommand);
@@ -124,8 +144,6 @@ namespace forsaken
                 Exiled.API.Features.Log.Warn($"Missing or invalid dependencies: {string.Join(", ", missingDependencies)}");
                 Exiled.API.Features.Log.Warn("Some features may not work without these dependencies!");
             }
-
-            Exiled.Events.Handlers.Player.DroppingItem += playerEvents.OnDroppingItem;
             
             if (Config.Debug)
                 Log.Debug("[Forsaken] Events registered successfully");
@@ -146,6 +164,10 @@ namespace forsaken
             {
                 Log.Debug("[Forsaken] Plugin is being disabled...");
             }
+
+            // Unregister item interaction events
+            Exiled.Events.Handlers.Player.DroppingItem -= playerEvents.OnDroppingItem;
+            Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
 
             // Unregister commands
             if (forsakenCommand != null)
@@ -233,11 +255,43 @@ namespace forsaken
 
         public void StartGameSequence()
         {
+            if (Config.Debug)
+            {
+                Log.Debug("[Forsaken] Starting game sequence...");
+            }
+
+            // Ensure item interactions are properly restricted based on config
+            Exiled.Events.Handlers.Player.DroppingItem -= playerEvents.OnDroppingItem;
+            Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
+
+            if (!Config.AllowItemDrops)
+            {
+                Exiled.Events.Handlers.Player.DroppingItem += playerEvents.OnDroppingItem;
+                if (Config.Debug)
+                {
+                    Log.Debug("[Forsaken] Re-registered item drop prevention for game sequence");
+                }
+            }
+
+            if (!Config.AllowItemPickups)
+            {
+                Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
+                if (Config.Debug)
+                {
+                    Log.Debug("[Forsaken] Re-registered item pickup prevention for game sequence");
+                }
+            }
+
             // Play the CASSIE countdown with exact spacing
             Cassie.Message("5 . 4 . 3 . 2 . 1 . hide", isSubtitles: true);
 
             // Start the sequence coroutine
             timerCoroutine = Timing.RunCoroutine(GameSequenceCoroutine());
+
+            if (Config.Debug)
+            {
+                Log.Debug("[Forsaken] Game sequence started");
+            }
         }
 
         private IEnumerator<float> GameSequenceCoroutine()
@@ -319,6 +373,25 @@ namespace forsaken
   time_up_message: Times Up! All alive players have been set to Tutorial.
   allow_item_drops: false
   allow_item_pickups: false";
+        }
+
+        // Item interaction event handlers
+        private void OnDroppingItem(Exiled.Events.EventArgs.Player.DroppingItemEventArgs ev)
+        {
+            if (Config.Debug)
+            {
+                Log.Debug($"[Forsaken] Preventing item drop for {ev.Player.Nickname}");
+            }
+            ev.IsAllowed = false;
+        }
+
+        private void OnPickingUpItem(Exiled.Events.EventArgs.Player.PickingUpItemEventArgs ev)
+        {
+            if (Config.Debug)
+            {
+                Log.Debug($"[Forsaken] Preventing item pickup for {ev.Player.Nickname}");
+            }
+            ev.IsAllowed = false;
         }
     }
 } 

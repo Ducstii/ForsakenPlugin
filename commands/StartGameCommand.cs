@@ -1,7 +1,5 @@
 using CommandSystem;
-using Exiled.API.Enums;
 using Exiled.API.Features;
-using Exiled.API.Features.Doors;
 using System;
 
 namespace forsaken.Commands
@@ -11,28 +9,32 @@ namespace forsaken.Commands
     {
         public string Command => "startgame";
         public string[] Aliases => Array.Empty<string>();
-        public string Description => "Starts the game with countdown and timer";
+        public string Description => "Starts the game with a countdown";
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            Log.Debug("StartGame command executing...");
+            try
+            {
+                var plugin = ForsakenPlugin.Instance;
 
-            // Disable item pickups
-            Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
-            Log.Debug("Item pickups disabled");
+                if (plugin.Config.Debug)
+                {
+                    Log.Debug("[StartGame] Command execution starting...");
+                }
 
-            var plugin = ForsakenPlugin.Instance;
-            plugin.StartGameSequence(); // Just call the method directly
-            Log.Debug("Game sequence started");
+                // Start the game sequence
+                plugin.StartGameSequence(); // Just call the method directly
 
-            response = "Game sequence started!";
-            return true;
-        }
-
-        private void OnPickingUpItem(Exiled.Events.EventArgs.Player.PickingUpItemEventArgs ev)
-        {
-            Log.Debug($"Blocked item pickup attempt by {ev.Player.Nickname}");
-            ev.IsAllowed = false;
+                Log.Debug("[StartGame] Game sequence started");
+                response = "Game sequence started!";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[StartGame] Error executing command: {ex.Message}");
+                response = $"An error occurred while starting the game: {ex.Message}";
+                return false;
+            }
         }
     }
 } 

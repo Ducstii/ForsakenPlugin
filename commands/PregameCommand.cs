@@ -57,6 +57,7 @@ namespace forsaken.Commands
 
                 // Unregister any existing event handlers to prevent duplicates
                 Exiled.Events.Handlers.Player.DroppingItem -= OnDroppingItem;
+                Exiled.Events.Handlers.Player.PickingUpItem -= OnPickingUpItem;
 
                 // Load the MiniGame map first
                 string mapName = plugin.Config.MapName;
@@ -104,6 +105,9 @@ namespace forsaken.Commands
                     {
                         if (door.Zone == ZoneType.LightContainment)
                         {
+                            // First unlock all doors to ensure consistent state
+                            door.ChangeLock(DoorLockType.None);
+                            
                             if (doorsToLockAndOpen.Contains(door.Name))
                             {
                                 // Lock and open specific doors
@@ -187,12 +191,10 @@ namespace forsaken.Commands
                     Log.Error("Invalid spawn position format in config!");
                 }
 
-                // Disable item drops if configured
-                if (!plugin.Config.AllowItemDrops)
-                {
-                    Exiled.Events.Handlers.Player.DroppingItem += OnDroppingItem;
-                    Log.Debug("Item drops disabled");
-                }
+                // Always disable item interactions
+                Exiled.Events.Handlers.Player.DroppingItem += OnDroppingItem;
+                Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpItem;
+                Log.Debug("Item interactions disabled");
 
                 response = "MiniGame map loaded, specific doors managed, lights turned off, and players teleported.";
                 return true;
@@ -208,6 +210,12 @@ namespace forsaken.Commands
         private void OnDroppingItem(Exiled.Events.EventArgs.Player.DroppingItemEventArgs ev)
         {
             Log.Debug($"Blocked item drop attempt by {ev.Player.Nickname}");
+            ev.IsAllowed = false;
+        }
+
+        private void OnPickingUpItem(Exiled.Events.EventArgs.Player.PickingUpItemEventArgs ev)
+        {
+            Log.Debug($"Blocked item pickup attempt by {ev.Player.Nickname}");
             ev.IsAllowed = false;
         }
     }
