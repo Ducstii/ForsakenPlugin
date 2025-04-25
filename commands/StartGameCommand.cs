@@ -22,7 +22,7 @@ namespace forsaken.Commands
             Log.Debug("Item pickups disabled");
 
             var plugin = ForsakenPlugin.Instance;
-            _ = plugin.StartGameSequence(); // Fire and forget
+            plugin.StartGameSequence(); // Just call the method directly
             Log.Debug("Game sequence started");
 
             response = "Game sequence started!";
