@@ -16,7 +16,7 @@ namespace forsaken
     {
         public override string Author => "Ducstii";
         public override string Name => "Forsaken";
-        public override Version Version => new Version(0, 5, 0);
+        public override Version Version => new Version(1, 0, 0);
         public override PluginPriority Priority => PluginPriority.Medium;
 
         private static ForsakenPlugin Singleton;
@@ -57,8 +57,7 @@ namespace forsaken
             if (Config.Debug)
             {
                 Log.Debug("[Forsaken] Plugin is being enabled...");
-            }
-
+            
             RegisterEvents();
             RegisterCommands();
             
