@@ -20,7 +20,7 @@
 			<HintPath>C:\Users\...\Documents\steamcmd\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
 		</Reference>
 		<Reference Include="ProjectMER">
-			<HintPath>C:\Users\Elliott\Downloads\ProjectMER.dll</HintPath>
+			<HintPath>C:\Users\...\Downloads\ProjectMER.dll</HintPath>
 			<Private>true</Private>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
